@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - "${HOST_PORT}:8080"
+    volumes:
+      - ./src:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: websocket-notice-server
+    restart: always
