@@ -55,14 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const data = JSON.parse(event.data);
         const message = data.message || '新しい通知だよん！💌';
+        const timestamp = data.timestamp || getCurrentTimestamp();
         showNotification(message);
-        addMessageCard(message);
+        addMessageCard(message, timestamp);
         updateNotificationCount();
       } catch (error) {
         console.error('受信したデータのパースに失敗したよ😢', error);
         const errorMessage = 'よくわからない通知が来たよ！';
         showNotification(errorMessage);
-        addMessageCard(errorMessage);
+        addMessageCard(errorMessage, getCurrentTimestamp());
         updateNotificationCount();
       }
     };
@@ -113,7 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function addMessageCard(message) {
+  // 現在時刻をyyyy/mm/dd hh:mm:ss形式で取得
+  function getCurrentTimestamp() {
+    return moment().format('YYYY/MM/DD HH:mm:ss');
+  }
+
+  function addMessageCard(message, timestamp) {
     const messagesList = document.getElementById('messages-list');
     
     // 空の状態を非表示にする
@@ -125,15 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = document.createElement('div');
     card.className = 'message-card';
 
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const timestamp = `${year}/${month}/${day}`;
+    // timestampが渡されていない場合は現在時刻を使用
+    const displayTimestamp = timestamp || getCurrentTimestamp();
 
     card.innerHTML = `
       <p>${message}</p>
-      <p class="timestamp">${timestamp}</p>
+      <p class="timestamp">${displayTimestamp}</p>
     `;
 
     // 新しいメッセージをリストの先頭に追加
@@ -177,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 起動時に初期メッセージを追加
   setTimeout(() => {
-    addMessageCard('🎉 Notice Hub へようこそ！');
+    addMessageCard('🎉 Notice Hub へようこそ！', getCurrentTimestamp());
     updateNotificationCount();
   }, 500);
 });
